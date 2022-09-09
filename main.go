@@ -30,8 +30,8 @@ func main() {
 
     c := Config{
         GoPaths: []GoPath{
-            { Root: "go.h4n.io/zetman", Type: "git", Source: "github.com/hbjydev/zetman" },
-            { Root: "go.h4n.io/centra/component-base", Type: "git", Source: "github.com/centra-oss/component-base" },
+            { Root: "go.h4n.io/zetman", Type: "git", Source: "https://github.com/hbjydev/zetman" },
+            { Root: "go.h4n.io/centra/component-base", Type: "git", Source: "https://github.com/centra-oss/component-base" },
         },
     }
 
