@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: nginx
-        image: ghcr.io/kuraudo-io/nail_care:main
+        image: ghcr.io/kuraudo-io/nail_care@sha256:bcd62af349478ab2babf27bae722960f007a14ebab5d6db1038dbae59b67d276
         ports:
         - containerPort: 8080
 

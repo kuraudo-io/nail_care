@@ -35,7 +35,7 @@ func main() {
         },
     }
 
-    m := http.NewServeMux()
+    // m := http.NewServeMux()
 
     tmpl, err := template.New("go-import").Parse(html)
     if err != nil {
@@ -43,29 +43,36 @@ func main() {
         return
     }
 
-    for _, p := range c.GoPaths {
-        parts := strings.Split(p.Root, "/")
-        routeParts := parts[1:]
-        route := fmt.Sprintf("/%v", strings.Join(routeParts, "/"))
-        log.Printf("registering handler for: %v", route)
+    httpHandler := http.HandlerFunc(func (w http.ResponseWriter, r *http.Request) {
+        url := r.URL.Path
+        log.Printf("GET %v", url)
 
-        handle := func (res http.ResponseWriter, req *http.Request) {
-            q := req.URL.Query()
-            if !q.Has("go-get") {
-                http.Redirect(res, req, fmt.Sprintf("https://pkg.go.dev/%v", p.Root), http.StatusTemporaryRedirect)
-                return
+        var goPath GoPath
+
+        for _, p := range c.GoPaths {
+            parts := strings.Split(p.Root, "/")
+            routeParts := parts[1:]
+            route := fmt.Sprintf("/%v", strings.Join(routeParts, "/"))
+
+            log.Printf("logging test for %v", route)
+
+            if strings.HasPrefix(url, route) {
+                goPath = p
             }
-
-            tmpl.Execute(res, p)
         }
 
-        m.HandleFunc(route, handle)
-        m.HandleFunc(fmt.Sprintf("%v/", route), handle)
-    }
+        q := r.URL.Query()
+        if !q.Has("go-get") {
+            http.Redirect(w, r, fmt.Sprintf("https://pkg.go.dev/%v", goPath.Root), http.StatusTemporaryRedirect)
+            return
+        }
+
+        tmpl.Execute(w, goPath)
+    })
 
     s := http.Server{
         Addr: "0.0.0.0:8080",
-        Handler: m,
+        Handler: httpHandler,
     }
 
     log.Fatal(s.ListenAndServe())
