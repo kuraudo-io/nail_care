@@ -2,17 +2,21 @@ FROM golang:1.19-alpine AS build
 
 WORKDIR /src
 
-COPY go.mod go.sum ./
+COPY go.mod go.mod
+COPY go.sum go.sum
 
 RUN go mod download
 
-COPY . .
-RUN GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o /src/nail_care main.go
+COPY main.go main.go
 
-FROM scratch
+RUN go build -ldflags="-w -s" -o /src/nailcare
 
-COPY --from=build /src/nail_care /nail_care
+###############################################################################
 
-ENTRYPOINT [ "/nail_care" ]
+FROM alpine:3.15
+
+COPY --from=build /src/nailcare /
+
+CMD [ "/nailcare" ]
 EXPOSE 8080
 
