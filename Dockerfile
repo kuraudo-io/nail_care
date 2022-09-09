@@ -7,13 +7,12 @@ COPY go.mod go.sum ./
 RUN go mod download
 
 COPY . .
-RUN go build -o nail_care main.go
+RUN GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o /src/nail_care main.go
 
-FROM alpine:3.15 AS run
-RUN apk update
+FROM scratch
 
-COPY --from=build /src/nail_care /usr/bin/nail_care
+COPY --from=build /src/nail_care /nail_care
 
-CMD [ "/usr/bin/nail_care" ]
+ENTRYPOINT [ "/nail_care" ]
 EXPOSE 8080
 
