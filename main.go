@@ -49,7 +49,7 @@ func main() {
         route := fmt.Sprintf("/%v", strings.Join(routeParts, "/"))
         log.Printf("registering handler for: %v", route)
 
-        m.HandleFunc(route, func (res http.ResponseWriter, req *http.Request) {
+        handle := func (res http.ResponseWriter, req *http.Request) {
             q := req.URL.Query()
             if !q.Has("go-get") {
                 http.Redirect(res, req, fmt.Sprintf("https://pkg.go.dev/%v", p.Root), http.StatusTemporaryRedirect)
@@ -57,7 +57,10 @@ func main() {
             }
 
             tmpl.Execute(res, p)
-        })
+        }
+
+        m.HandleFunc(route, handle)
+        m.HandleFunc(fmt.Sprintf("%v/", route), handle)
     }
 
     s := http.Server{

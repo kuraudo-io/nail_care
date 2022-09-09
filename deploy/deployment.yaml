@@ -39,6 +39,7 @@ kind: Ingress
 metadata:
   name: nail-care-ingress
 spec:
+  ingressClassName: nginx
   rules:
   - host: "go.h4n.io"
     http:
